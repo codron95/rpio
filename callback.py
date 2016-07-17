@@ -1,10 +1,13 @@
-from gpio_module  import digitalReadChange
+from gpio_module  import digitalReadChangeWithInterrupt
 import time
 
 def prin(x):
 	print(str(x)+":state change on background thread")
 
-digitalReadChange(8,prin)
+t=digitalReadChangeWithInterrupt(8,prin)
+t.start()
+t.start()
 while 1:
-	print("Main thread")
-	time.sleep(1)
+	print("Main thread Running")
+	time.sleep(4)
+	t.stop()

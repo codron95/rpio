@@ -114,21 +114,21 @@ class digitalReadChangeWithInterrupt(threading.Thread):
 		self.debug=debug
 		
 	def state_change_callback(self):
-	if(self.pin==None):
-		if self.debug:
-			print("Please specify the pin no. Error code 2")
-		return 2
-	else:
-		GPIO.setmode(self.mode)
-		GPIO.setup(self.pin,GPIO.IN)
-		prev=GPIO.input(self.pin)
-		time.sleep(self.freq)
-		while 1:
-			next=GPIO.input(self.pin)
-			if next!=prev:
-				callback(next)
-			prev=next
+		if(self.pin==None):
+			if self.debug:
+				print("Please specify the pin no. Error code 2")
+			return 2
+		else:
+			GPIO.setmode(self.mode)
+			GPIO.setup(self.pin,GPIO.IN)
+			prev=GPIO.input(self.pin)
 			time.sleep(self.freq)
+			while self.control:
+				next=GPIO.input(self.pin)
+				if next!=prev:
+					self.callback(next)
+					prev=next
+					time.sleep(self.freq)
 	
 	def start(self):
 		if not self.control:
