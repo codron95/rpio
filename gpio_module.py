@@ -102,5 +102,53 @@ class digitalReadWithInterrupt(threading.Thread):
 			if self.debug:
 				print("No running thread. Error code 4")
 			return 4
+			
+			
+class digitalReadChangeWithInterrupt(threading.Thread):
+	def __init__(self,pin,callback,debug=1,freq=1,mode=GPIO.BOARD):
+		self.pin=pin
+		self.control=0
+		self.callback=callback
+		self.freq=freq
+		self.mode=mode
+		self.debug=debug
+		
+	def state_change_callback(self):
+	if(self.pin==None):
+		if self.debug:
+			print("Please specify the pin no. Error code 2")
+		return 2
+	else:
+		GPIO.setmode(self.mode)
+		GPIO.setup(self.pin,GPIO.IN)
+		prev=GPIO.input(self.pin)
+		time.sleep(self.freq)
+		while 1:
+			next=GPIO.input(self.pin)
+			if next!=prev:
+				callback(next)
+			prev=next
+			time.sleep(self.freq)
+	
+	def start(self):
+		if not self.control:
+			thread=threading.Thread(target=self.state_change_callback,args=())
+			thread.daemon=True
+			thread.start()
+			self.control=1
+		else:
+			if self.debug:
+				print("thread already running on pin:"+str(self.pin)+" Error code 3")
+			return 3
+				
+				
+	def stop(self):
+		if self.control:
+			self.control=0
+			print("terminating thread on pin:"+str(self.pin))
+		else:
+			if self.debug:
+				print("No running thread. Error code 4")
+			return 4
 		
 		
