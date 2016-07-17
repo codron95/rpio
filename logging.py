@@ -1,7 +1,7 @@
-from gpio_module import log_pin
+from gpio_module import digitalReadLog
 import time
 
-log_pin(8)
+digitalReadLog(8)
 
 while 1:
 	print("Main thread")

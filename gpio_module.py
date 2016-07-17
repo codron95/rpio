@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import threading
 
-def digital_read(pin,mode=GPIO.BOARD):
+def digitalRead(pin,mode=GPIO.BOARD):
 	if(pin==None):
 		print("Please specify the pin no.")
 		return
@@ -42,12 +42,12 @@ def state_change_callback(pin,callback,freq=1,mode=GPIO.BOARD):
 			prev=next
 			time.sleep(freq)
 
-def log_pin(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
+def digitalReadLog(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
 	thread=threading.Thread(target=file_log,args=(pin,filename,freq,mode,))
 	thread.daemon=True
 	thread.start()
 
-def state_callback(pin,callback,freq=1,mode=GPIO.BOARD):
+def digitalReadChange(pin,callback,freq=1,mode=GPIO.BOARD):
 	thread=threading.Thread(target=state_change_callback,args=(pin,callback,freq,mode,))
 	thread.daemon=True
 	thread.start()
