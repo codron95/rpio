@@ -52,32 +52,37 @@ def digitalReadChange(pin,callback,freq=1,mode=GPIO.BOARD):
 	thread.daemon=True
 	thread.start()
 	
-class intthread(threading):
-	def __init__(self,pin,control,filename="log.txt",freq=1,mode=GPIO.BOARD):
+class digitalReadWithInterrupt(threading.Thread):
+	def __init__(self,pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
 		self.pin=pin
-		self.control=control
+		self.control=1
 		self.filename=filename
 		self.freq=freq
 		self.mode=mode
 		
-	def file_log():
-		if(pin==None):
+	def file_log(self):
+		if(self.pin==None):
 			print("Please specify the pin no.")
 			return
 		else:
-			GPIO.setmode(mode)
-			GPIO.setup(pin,GPIO.IN)
-			file=open(filename,"w+")
-			while control:
-				state=GPIO.input(pin)
+			GPIO.setmode(self.mode)
+			GPIO.setup(self.pin,GPIO.IN)
+			file=open(self.filename,"w+")
+			while self.control:
+				state=GPIO.input(self.pin)
 				cur_time=time.asctime(time.localtime(time.time()))
 				log=cur_time+"\t\t"+str(state)+"\n"
 				print(log)
 				file.write(log)
-				time.sleep(freq)
+				time.sleep(self.freq)
+	
+	def start(self):
+		thread=threading.Thread(target=self.file_log,args=())
+		thread.daemon=True
+		thread.start()
 				
-	def stop():
-		control=0
-		print("exiting thread")
+	def stop(self):
+		self.control=0
+		print("Logger Thread Terminated")
 		
 		
