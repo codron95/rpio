@@ -2,19 +2,21 @@ import RPi.GPIO as GPIO
 import time
 import threading
 
-def digitalRead(pin,mode=GPIO.BOARD):
+def digitalRead(pin,debug=1,mode=GPIO.BOARD):
 	if(pin==None):
-		print("Please specify the pin no.")
-		return
+		if debug:
+			print("Please specify the pin no. Error code 2")
+		return 2
 	else:
 		GPIO.setmode(mode)
 		GPIO.setup(pin,GPIO.IN)
 		return GPIO.input(pin)
 
-def file_log(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
+def file_log(pin,debug=1,filename="log.txt",freq=1,mode=GPIO.BOARD):
 	if(pin==None):
-		print("Please specify the pin no.")
-		return
+		if debug:
+			print("Please specify the pin no. Error code 2")
+		return 2
 	else:
 		GPIO.setmode(mode)
 		GPIO.setup(pin,GPIO.IN)
@@ -27,9 +29,11 @@ def file_log(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
 			file.write(log)
 			time.sleep(freq)
 
-def state_change_callback(pin,callback,freq=1,mode=GPIO.BOARD):
+def state_change_callback(pin,callback,debug=1,freq=1,mode=GPIO.BOARD):
 	if(pin==None):
-		print("Please specify the pin no")
+		if debug:
+			print("Please specify the pin no. Error code 2")
+		return 2
 	else:
 		GPIO.setmode(mode)
 		GPIO.setup(pin,GPIO.IN)
@@ -42,28 +46,30 @@ def state_change_callback(pin,callback,freq=1,mode=GPIO.BOARD):
 			prev=next
 			time.sleep(freq)
 
-def digitalReadLog(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
-	thread=threading.Thread(target=file_log,args=(pin,filename,freq,mode,))
+def digitalReadLog(pin,debug=1,filename="log.txt",freq=1,mode=GPIO.BOARD):
+	thread=threading.Thread(target=file_log,args=(pin,debug,filename,freq,mode,))
 	thread.daemon=True
 	thread.start()
 
-def digitalReadChange(pin,callback,freq=1,mode=GPIO.BOARD):
-	thread=threading.Thread(target=state_change_callback,args=(pin,callback,freq,mode,))
+def digitalReadChange(pin,callback,debug=1,freq=1,mode=GPIO.BOARD):
+	thread=threading.Thread(target=state_change_callback,args=(pin,callback,debug,freq,mode,))
 	thread.daemon=True
 	thread.start()
 	
 class digitalReadWithInterrupt(threading.Thread):
-	def __init__(self,pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
+	def __init__(self,pin,debug=1,filename="log.txt",freq=1,mode=GPIO.BOARD):
 		self.pin=pin
-		self.control=1
+		self.control=0
 		self.filename=filename
 		self.freq=freq
 		self.mode=mode
+		self.debug=debug
 		
 	def file_log(self):
 		if(self.pin==None):
-			print("Please specify the pin no.")
-			return
+			if self.debug:
+				print("Please specify the pin no. Error code 2")
+			return 2
 		else:
 			GPIO.setmode(self.mode)
 			GPIO.setup(self.pin,GPIO.IN)
@@ -77,12 +83,24 @@ class digitalReadWithInterrupt(threading.Thread):
 				time.sleep(self.freq)
 	
 	def start(self):
-		thread=threading.Thread(target=self.file_log,args=())
-		thread.daemon=True
-		thread.start()
+		if not self.control:
+			thread=threading.Thread(target=self.file_log,args=())
+			thread.daemon=True
+			thread.start()
+			self.control=1
+		else:
+			if self.debug:
+				print("thread already running on pin:"+str(self.pin)+" Error code 3")
+			return 3
+				
 				
 	def stop(self):
-		self.control=0
-		print("Logger Thread Terminated")
+		if self.control:
+			self.control=0
+			print("terminating thread on pin:"+str(self.pin))
+		else:
+			if self.debug:
+				print("No running thread. Error code 4")
+			return 4
 		
 		
