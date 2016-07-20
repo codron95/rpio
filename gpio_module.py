@@ -93,7 +93,7 @@ class digitalReadWithInterrupt(threading.Thread):
 				print("Frequency cannot be 0. Error code 6")
 			return 6
 		else:
-		self.time=1/self.freq
+			self.time=1/self.freq
 		
 	def file_log(self):
 		if(self.pin==None):
@@ -152,7 +152,7 @@ class digitalReadChangeWithInterrupt(threading.Thread):
 				print("Frequency cannot be 0. Error code 6")
 			return 6
 		else:
-		self.time=1/self.freq
+			self.time=1/self.freq
 		
 	def state_change_callback(self):
 		if(self.pin==None):
