@@ -41,6 +41,13 @@ def file_log(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
 			print("thread terminated on pin: "+str(pin))
 
 def state_change_callback(pin,callback,freq=1,mode=GPIO.BOARD):
+	if freq==0:
+		if debug:
+			print("Frequency cannot be 0. Error code 6")
+		return 6
+	else:
+		time=1/freq
+		
 	global debug
 	if(pin==None):
 		if debug:
@@ -50,13 +57,13 @@ def state_change_callback(pin,callback,freq=1,mode=GPIO.BOARD):
 		GPIO.setmode(mode)
 		GPIO.setup(pin,GPIO.IN)
 		prev=GPIO.input(pin)
-		time.sleep(freq)
+		time.sleep(time)
 		while 1:
 			next=GPIO.input(pin)
 			if next!=prev:
 				callback(next)
 			prev=next
-			time.sleep(freq)
+			time.sleep(time)
 		if(debug):
 			print("thread terminated on pin: "+str(pin))
 
@@ -81,6 +88,12 @@ class digitalReadWithInterrupt(threading.Thread):
 		self.freq=freq
 		self.mode=mode
 		self.debug=debug
+		if self.freq==0:
+			if debug:
+				print("Frequency cannot be 0. Error code 6")
+			return 6
+		else:
+		self.time=1/self.freq
 		
 	def file_log(self):
 		if(self.pin==None):
@@ -97,7 +110,7 @@ class digitalReadWithInterrupt(threading.Thread):
 				log=cur_time+"\t\t"+str(state)+"\n"
 				print(log)
 				file.write(log)
-				time.sleep(self.freq)
+				time.sleep(self.time)
 			if(debug):
 				print("thread terminated on pin: "+str(self.pin))
 	
@@ -134,6 +147,13 @@ class digitalReadChangeWithInterrupt(threading.Thread):
 		self.mode=mode
 		self.debug=debug
 		
+		if self.freq==0:
+			if debug:
+				print("Frequency cannot be 0. Error code 6")
+			return 6
+		else:
+		self.time=1/self.freq
+		
 	def state_change_callback(self):
 		if(self.pin==None):
 			if self.debug:
@@ -143,13 +163,13 @@ class digitalReadChangeWithInterrupt(threading.Thread):
 			GPIO.setmode(self.mode)
 			GPIO.setup(self.pin,GPIO.IN)
 			prev=GPIO.input(self.pin)
-			time.sleep(self.freq)
+			time.sleep(self.time)
 			while self.control:
 				next=GPIO.input(self.pin)
 				if next!=prev:
 					self.callback(next)
 					prev=next
-					time.sleep(self.freq)
+					time.sleep(self.time)
 			if(debug):
 				print("Thread terminated on: "+str(self.pin))
 	
