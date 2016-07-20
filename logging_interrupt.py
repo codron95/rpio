@@ -1,7 +1,6 @@
 import gpio_module as gpio
 import time
 
-gpio.debug=0
 t = gpio.digitalReadWithInterrupt(10)
 
 t.start()

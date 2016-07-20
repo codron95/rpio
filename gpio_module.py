@@ -15,6 +15,12 @@ def digitalRead(pin,mode=GPIO.BOARD):
 		return GPIO.input(pin)
 
 def file_log(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
+	if freq==0:
+		if debug:
+			print("Frequency cannot be 0. Error code 6")
+		return 6
+	else:
+		time=1/freq
 	global debug
 	if(pin==None):
 		if debug:
@@ -30,7 +36,9 @@ def file_log(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
 			log=cur_time+"\t\t"+str(state)+"\n"
 			print(log)
 			file.write(log)
-			time.sleep(freq)
+			time.sleep(time)
+		if(debug):
+			print("thread terminated on pin: "+str(pin))
 
 def state_change_callback(pin,callback,freq=1,mode=GPIO.BOARD):
 	global debug
@@ -49,6 +57,8 @@ def state_change_callback(pin,callback,freq=1,mode=GPIO.BOARD):
 				callback(next)
 			prev=next
 			time.sleep(freq)
+		if(debug):
+			print("thread terminated on pin: "+str(pin))
 
 def digitalReadLog(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
 	global debug
@@ -88,6 +98,8 @@ class digitalReadWithInterrupt(threading.Thread):
 				print(log)
 				file.write(log)
 				time.sleep(self.freq)
+			if(debug):
+				print("thread terminated on pin: "+str(self.pin))
 	
 	def start(self):
 		if not self.control:
@@ -138,6 +150,8 @@ class digitalReadChangeWithInterrupt(threading.Thread):
 					self.callback(next)
 					prev=next
 					time.sleep(self.freq)
+			if(debug):
+				print("Thread terminated on: "+str(self.pin))
 	
 	def start(self):
 		if not self.control:
