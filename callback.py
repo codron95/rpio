@@ -4,7 +4,7 @@ import time
 def prin(x):
 	print(str(x)+":state change on background thread")
 
-t=digitalReadChangeWithInterrupt(8,prin)
+t=digitalReadChangeWithInterrupt(8,prin,2)
 t.start()
 t.start()
 while 1:

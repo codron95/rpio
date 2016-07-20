@@ -1,3 +1,4 @@
+from __future__ import division
 import RPi.GPIO as GPIO
 import time
 import threading
@@ -15,13 +16,14 @@ def digitalRead(pin,mode=GPIO.BOARD):
 		return GPIO.input(pin)
 
 def file_log(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
+	global debug
 	if freq==0:
 		if debug:
 			print("Frequency cannot be 0. Error code 6")
 		return 6
 	else:
 		time=1/freq
-	global debug
+
 	if(pin==None):
 		if debug:
 			print("Please specify the pin no. Error code 2")
@@ -41,14 +43,14 @@ def file_log(pin,filename="log.txt",freq=1,mode=GPIO.BOARD):
 			print("thread terminated on pin: "+str(pin))
 
 def state_change_callback(pin,callback,freq=1,mode=GPIO.BOARD):
+	global debug
 	if freq==0:
 		if debug:
 			print("Frequency cannot be 0. Error code 6")
 		return 6
 	else:
 		time=1/freq
-		
-	global debug
+
 	if(pin==None):
 		if debug:
 			print("Please specify the pin no. Error code 2")
@@ -94,9 +96,11 @@ class digitalReadWithInterrupt(threading.Thread):
 		if self.freq==0:
 			if debug:
 				print("Frequency cannot be 0. Error code 6")
+			self.control=0
 			return 6
 		else:
-			self.time=1/freq
+			t=1/self.freq
+			print(t)
 			
 		if(self.pin==None):
 			if self.debug:
@@ -112,7 +116,7 @@ class digitalReadWithInterrupt(threading.Thread):
 				log=cur_time+"\t\t"+str(state)+"\n"
 				print(log)
 				file.write(log)
-				time.sleep(self.time)
+				time.sleep(t)
 			if(debug):
 				print("thread terminated on pin: "+str(self.pin))
 	
@@ -153,9 +157,10 @@ class digitalReadChangeWithInterrupt(threading.Thread):
 		if self.freq==0:
 			if debug:
 				print("Frequency cannot be 0. Error code 6")
+			self.control=0
 			return 6
 		else:
-			self.time=1/freq
+			self.time=1/self.freq
 			
 		if(self.pin==None):
 			if self.debug:
