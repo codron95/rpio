@@ -160,7 +160,7 @@ class digitalReadChangeWithInterrupt(threading.Thread):
 			self.control=0
 			return 6
 		else:
-			self.time=1/self.freq
+			t=1/self.freq
 			
 		if(self.pin==None):
 			if self.debug:
@@ -170,13 +170,13 @@ class digitalReadChangeWithInterrupt(threading.Thread):
 			GPIO.setmode(self.mode)
 			GPIO.setup(self.pin,GPIO.IN)
 			prev=GPIO.input(self.pin)
-			time.sleep(self.time)
+			time.sleep(t)
 			while self.control:
 				next=GPIO.input(self.pin)
 				if next!=prev:
 					self.callback(next)
 					prev=next
-					time.sleep(self.time)
+					time.sleep(t)
 			if(debug):
 				print("Thread terminated on: "+str(self.pin))
 	
